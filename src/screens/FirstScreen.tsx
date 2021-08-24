@@ -57,4 +57,3 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     </View>
   )
 }
-

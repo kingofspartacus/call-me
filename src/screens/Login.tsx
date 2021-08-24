@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text,Image, TextInput, TouchableOpacity } from 'react-native'
 import auth from '@react-native-firebase/auth';
-export default function Login({ navigation }: { navigation: any }) {
+import styles from '../StyleSheet/LoginTS'
+
+export default function LoginMail({ navigation }: { navigation: any }) {
   // const navigation = useNavigation()
   const [Email, useEmail] = useState('');
   const [Password, UsePassword] = useState('');
-  const [user, setUser] = useState();
   const SignIn = (Email: string, Password: string) => {
+    if (!Email.trim()) {
+      alert('Please Enter Username');
+      return;
+    }
+    if (!Password.trim()) {
+      alert('Please Enter Password');
+      return;
+    }
     auth()
       .signInWithEmailAndPassword(Email, Password)
       .catch(error => {
@@ -24,23 +33,29 @@ export default function Login({ navigation }: { navigation: any }) {
     return subscriber;
   }, []);
   return (
-    <View>
+    <View style={styles.container}>
+      <Image
+        source={require('../assets/images/Logo.png')}
+        style={styles.Img}
+      />
       <TextInput
         onChangeText={useEmail}
         value={Email}
-        placeholder="User name"
+        placeholder="Email"
+        style={styles.TextIP}
       />
-      <Text>Password</Text>
       <TextInput
         onChangeText={UsePassword}
         value={Password}
+        style={styles.TextIP}
         placeholder="Password"
+        secureTextEntry={true} 
       />
-      <TouchableOpacity onPress={() => SignIn(Email, Password)}>
-        <Text>Đăng nhập</Text>
+      <TouchableOpacity onPress={() => SignIn(Email, Password)} style={styles.Signin}>
+        <Text style={styles.txtLogin}>Đăng nhập</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-        <Text>Sign Up</Text>
+        <Text style={styles.txtSignUp}>Sign Up</Text>
       </TouchableOpacity>
     </View>
   )

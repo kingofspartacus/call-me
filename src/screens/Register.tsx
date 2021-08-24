@@ -1,18 +1,30 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity, Alert } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
-import { Alert } from 'react-native';
+import styles from '../StyleSheet/SignUpTS'
 // import { auth, authCurrent } from '../components/FireConect';
 
-export default function Register() {
+export default function Register({ navigation }: { navigation: any }) {
   const [Email, useEmail] = useState('');
   const [Password, UsePassword] = useState('');
   const [Name, setName] = useState('');
   const [ImgUrl, setImgUrl] = useState('');
   // const auth = firebase.auth();
   const regisiter = (Email: string, Password: string) => {
+    if (!Email.trim()) {
+      alert('Please Enter Username');
+      return;
+    }
+    if (!Password.trim()) {
+      alert('Please Enter Password');
+      return;
+    }
+    if (!Name.trim()) {
+      alert('Please Enter Name');
+      return;
+    }
     auth()
       .createUserWithEmailAndPassword(Email, Password)
       .then((userCredential) => {
@@ -77,29 +89,47 @@ export default function Register() {
       });
   };
   return (
-    <View>
-      <TextInput
-        onChangeText={setName}
-        value={Name}
-        placeholder="Your name here"
-      />
-      <TextInput
-        onChangeText={useEmail}
-        value={Email}
-        placeholder="Your email here"
-      />
-      <TextInput
-        onChangeText={UsePassword}
-        value={Password}
-        placeholder="Your passwork here"
-      />
-      <TextInput
-        onChangeText={setImgUrl}
-        value={ImgUrl}
-        placeholder="Your url image here"
-      />
-      <TouchableOpacity onPress={() => regisiter(Email, Password)}>
-        <Text>Sign Up</Text>
+    <View style={styles.container}>
+      <View style={styles.containersub}>
+        <Image
+          source={require('../assets/images/Logo2.png')}
+          style={styles.Img}
+        />
+        <Text style={styles.Title}>Create Account</Text>
+      </View>
+      <View style={styles.containerIp}>
+        <TextInput
+          onChangeText={useEmail}
+          value={Email}
+          placeholder="Enter your email here"
+          style={styles.TextIP}
+        />
+        <TextInput
+          onChangeText={UsePassword}
+          value={Password}
+          placeholder="Enter your passwork here"
+          style={styles.TextIP}
+          secureTextEntry={true} 
+        />
+        <TextInput
+          onChangeText={setName}
+          value={Name}
+          placeholder="Enter your name here"
+          style={styles.TextIP}
+        />
+        <TextInput
+          onChangeText={setImgUrl}
+          value={ImgUrl}
+          placeholder="Enter your url image here"
+          style={styles.TextIP}
+        />
+      </View>
+      <TouchableOpacity onPress={() => regisiter(Email, Password)} style={styles.Signup}>
+        <Text style={styles.txtLogin}>Sign Up</Text>
+      </TouchableOpacity>
+      <Text style={styles.textOr}>or</Text>
+      <TouchableOpacity onPress={() => navigation.replace('Login')} style={styles.Signup}>
+        <Text style={styles.txtLogin}>Log in</Text>
       </TouchableOpacity>
     </View>
   )
