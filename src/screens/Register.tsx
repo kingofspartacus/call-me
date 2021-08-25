@@ -40,6 +40,7 @@ export default function Register({ navigation }: { navigation: any }) {
         firestore()
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
+            emailUser:authCurrent?.email,
             displayName: Name,
             status: false,
             ImgUrl: ImgUrl

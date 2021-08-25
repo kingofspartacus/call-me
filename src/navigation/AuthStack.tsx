@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login'
 import Register from '../screens/Register';
 import FirstScreen from '../screens/FirstScreen';
+
 const Stack = createStackNavigator();
 const Authent = () => {
   return (
