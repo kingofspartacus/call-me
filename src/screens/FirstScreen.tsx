@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, FlatList, } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
+import styles from '../StyleSheet/FirstScreenTS'
 
 export default function FirstScreen({ navigation }: { navigation: any }) {
   const [data, setData] = useState([]);
@@ -17,6 +18,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       }));
       setData(docsData);
     })
+    
   }, []);
   useEffect(() => {
     firestore().collection('users').doc(authID).update({

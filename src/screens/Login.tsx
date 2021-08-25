@@ -52,7 +52,7 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         secureTextEntry={true} 
       />
       <TouchableOpacity onPress={() => SignIn(Email, Password)} style={styles.Signin}>
-        <Text style={styles.txtLogin}>Đăng nhập</Text>
+        <Text style={styles.txtLogin}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.txtSignUp}>Sign Up</Text>
