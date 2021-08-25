@@ -4,6 +4,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import styles from '../StyleSheet/SignUpTS'
+import messaging from '@react-native-firebase/messaging';
 // import { auth, authCurrent } from '../components/FireConect';
 
 export default function Register({ navigation }: { navigation: any }) {
@@ -46,7 +47,11 @@ export default function Register({ navigation }: { navigation: any }) {
               ? ImgUrl
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });
-
+          messaging().getToken().then(token=>{
+            firestore().collection('usertoken').add({
+                token:token
+            })
+          })
         var user = userCredential.user;
         user
           .updateProfile({

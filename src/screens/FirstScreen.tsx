@@ -7,8 +7,11 @@ import firebase from "@react-native-firebase/app";
 export default function FirstScreen({ navigation }: { navigation: any }) {
   const [data, setData] = useState([]);
   const [authID, setAuthId] = useState();
+  
+    
   useEffect(() => {
     auth()
+    
     const authCurrent: any = firebase.auth().currentUser?.uid;
     setAuthId(authCurrent);
     firestore().collection('users').onSnapshot(querySnapshot => {
@@ -23,6 +26,23 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       status: true,
     });
   }, [authID])
+  const sendNoti = ()=>{
+    firestore().collection('usertoken').get().then(querySnap =>{
+      const userDevicetoken = querySnap.docs.map(docSnap =>{
+        return docSnap.data().token
+      })
+      console.log('userDevicetoken',userDevicetoken)
+      fetch('https://b796-123-24-188-243.ngrok.io/send-noti',{
+        method:'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          tokens: userDevicetoken
+        })   
+      })
+    })
+  }
   const SignOut = (authID: any) => {
     firestore().collection('users').doc(authID).update({ status: false, });
     auth().signOut()
@@ -37,6 +57,9 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     <View>
       <TouchableOpacity onPress={() => { SignOut(authID) }}>
         <Text>Log out</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => {sendNoti()}}>
+        <Text>test</Text>
       </TouchableOpacity>
       <FlatList
         data={data}
