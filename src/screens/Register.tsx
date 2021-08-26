@@ -104,6 +104,7 @@ export default function Register({ navigation }: { navigation: any }) {
           value={Email}
           placeholder="Enter your email here"
           style={styles.TextIP}
+          placeholderTextColor={'grey'}
         />
         <TextInput
           onChangeText={UsePassword}
@@ -111,18 +112,21 @@ export default function Register({ navigation }: { navigation: any }) {
           placeholder="Enter your passwork here"
           style={styles.TextIP}
           secureTextEntry={true} 
+          placeholderTextColor={'grey'}
         />
         <TextInput
           onChangeText={setName}
           value={Name}
           placeholder="Enter your name here"
           style={styles.TextIP}
+          placeholderTextColor={'grey'}
         />
         <TextInput
           onChangeText={setImgUrl}
           value={ImgUrl}
           placeholder="Enter your url image here"
           style={styles.TextIP}
+          placeholderTextColor={'grey'}
         />
       </View>
       <TouchableOpacity onPress={() => regisiter(Email, Password)} style={styles.Signup}>

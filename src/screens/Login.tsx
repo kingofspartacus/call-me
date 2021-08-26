@@ -43,6 +43,7 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         value={Email}
         placeholder="Email"
         style={styles.TextIP}
+        placeholderTextColor={'grey'}
       />
       <TextInput
         onChangeText={UsePassword}
@@ -50,6 +51,7 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         style={styles.TextIP}
         placeholder="Password"
         secureTextEntry={true} 
+        placeholderTextColor={'grey'}
       />
       <TouchableOpacity onPress={() => SignIn(Email, Password)} style={styles.Signin}>
         <Text style={styles.txtLogin}>Login</Text>

@@ -5,17 +5,16 @@ import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import styles from '../StyleSheet/FirstScreenTS'
 
-
 export default function FirstScreen({ navigation }: { navigation: any }) {
   const [data, setData] = useState([]);
   const [authID, setAuthId] = useState();
-  // const [authenUser, setAuthenUser] = useState([])
+  const [authenUser, setAuthenUser] = useState([])
   useEffect(() => {
     auth()
     const authCurrent: any = firebase.auth().currentUser?.uid;
-    // const authUser:any = firebase.auth().currentUser
-    // setAuthenUser(authUser)
-    // console.log('auth', authUser)
+    const authUser:any = firebase.auth().currentUser
+    setAuthenUser(authUser)
+    console.log('auth', authUser)
     setAuthId(authCurrent);
     firestore().collection('users').onSnapshot(querySnapshot => {
       const docsData: any = querySnapshot.docs.map(doc => ({
@@ -43,8 +42,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     <View>
       <View style={styles.header}>
         <View style={styles.containerLeft}>
-          {/* <Image source={{ uri: authenUser.photoURL }} style={styles.ImgT} /> */}
-          <Text style={styles.title}>Call Me</Text>
+          <Image source={{ uri: authenUser.photoURL }} style={styles.ImgT} />
+          <Text style={styles.title}>{authenUser.displayName}</Text>
         </View>
         <TouchableOpacity onPress={() => { SignOut(authID) }} style={styles.btout}>
           <Text style={styles.outtxt}>Log out</Text>
