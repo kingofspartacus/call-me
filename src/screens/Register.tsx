@@ -40,6 +40,7 @@ export default function Register({ navigation }: { navigation: any }) {
         firestore()
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
+            emailUser: authCurrent?.email,
             displayName: Name,
             status: false,
             ImgUrl: ImgUrl
@@ -109,7 +110,7 @@ export default function Register({ navigation }: { navigation: any }) {
           value={Password}
           placeholder="Enter your passwork here"
           style={styles.TextIP}
-          secureTextEntry={true} 
+          secureTextEntry={true}
         />
         <TextInput
           onChangeText={setName}

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, FlatList, } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
-
+import messaging from '@react-native-firebase/messaging';
 export default function FirstScreen({ navigation }: { navigation: any }) {
   const [data, setData] = useState([]);
   const [authID, setAuthId] = useState();
@@ -11,6 +11,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     auth()
     const authCurrent: any = firebase.auth().currentUser?.uid;
     setAuthId(authCurrent);
+    const curent: any = firebase.auth().currentUser;
+    console.log(curent)
     firestore().collection('users').onSnapshot(querySnapshot => {
       const docsData: any = querySnapshot.docs.map(doc => ({
         ...doc.data()
