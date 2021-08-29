@@ -12,6 +12,7 @@ export default function Register({ navigation }: { navigation: any }) {
   const [Password, UsePassword] = useState('');
   const [Name, setName] = useState('');
   const [ImgUrl, setImgUrl] = useState('');
+  
   // const auth = firebase.auth();
   const regisiter = (Email: string, Password: string) => {
     if (!Email.trim()) {
@@ -43,15 +44,13 @@ export default function Register({ navigation }: { navigation: any }) {
             id: authCurrent.uid,
             displayName: Name,
             status: false,
+            token: '',
             ImgUrl: ImgUrl
+            
               ? ImgUrl
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });
-          messaging().getToken().then(token=>{
-            firestore().collection('usertoken').add({
-                token:token
-            })
-          })
+         
         var user = userCredential.user;
         user
           .updateProfile({
