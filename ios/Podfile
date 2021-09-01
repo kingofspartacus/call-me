@@ -12,9 +12,9 @@ target 'Call_Me' do
     :hermes_enabled => false
   )
 
-  pod 'RNFBApp', :path => '../node_modules/@react-native-firebase/app'
+  pod 'RNCallKeep', :path => '../node_modules/react-native-callkeep'
 
-  pod 'RNFBMessaging', :path => '../node_modules/@react-native-firebase/messaging'
+  pod 'RNVoipCall', :path => '../node_modules/react-native-voip-call'
 
   target 'Call_MeTests' do
     inherit! :complete

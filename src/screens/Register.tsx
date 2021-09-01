@@ -4,6 +4,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import styles from '../StyleSheet/SignUpTS'
+import messaging from '@react-native-firebase/messaging';
 // import { auth, authCurrent } from '../components/FireConect';
 
 export default function Register({ navigation }: { navigation: any }) {
@@ -11,6 +12,7 @@ export default function Register({ navigation }: { navigation: any }) {
   const [Password, UsePassword] = useState('');
   const [Name, setName] = useState('');
   const [ImgUrl, setImgUrl] = useState('');
+
   // const auth = firebase.auth();
   const regisiter = (Email: string, Password: string) => {
     if (!Email.trim()) {
@@ -40,10 +42,11 @@ export default function Register({ navigation }: { navigation: any }) {
         firestore()
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
-            emailUser: authCurrent?.email,
             displayName: Name,
             status: false,
+            token: '',
             ImgUrl: ImgUrl
+
               ? ImgUrl
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });

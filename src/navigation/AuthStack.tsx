@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../screens/Login'
 import Register from '../screens/Register';
 import FirstScreen from '../screens/FirstScreen';
+import nam from '../screens/Haha';
 import { Header } from 'react-native/Libraries/NewAppScreen';
 const Stack = createStackNavigator();
 const Authent = () => {
@@ -20,6 +21,7 @@ const Authent = () => {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Register" component={Register} />
       <Stack.Screen name="FirstScreen" component={FirstScreen} />
+      <Stack.Screen name="nam" component={nam} />
     </Stack.Navigator>
   );
 };

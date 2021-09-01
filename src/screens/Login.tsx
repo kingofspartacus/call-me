@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { View, Text,Image, TextInput, TouchableOpacity } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import styles from '../StyleSheet/LoginTS'
-
+import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 export default function LoginMail({ navigation }: { navigation: any }) {
   // const navigation = useNavigation()
   const [Email, useEmail] = useState('');
