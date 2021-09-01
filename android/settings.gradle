@@ -1,3 +1,9 @@
 rootProject.name = 'Call_Me'
+include ':react-native-voip-call'
+project(':react-native-voip-call').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-voip-call/android')
+include ':react-native-callkeep'
+project(':react-native-callkeep').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-callkeep/android')
+include ':react-native-callkeep'
+project(':react-native-callkeep').projectDir = new File(rootProject.projectDir, '../../../../../AppData/Roaming/npm/node_modules/react-native-callkeep/android')
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'

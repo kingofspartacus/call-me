@@ -14,9 +14,10 @@ app.post('/send-noti',(req,res)=>{
     console.log(req.body)
         const message ={
             notification:{
-            title:"new ad",
-            body:"new ad posted click to open"
+            title:"Mess",
+            body:"????",
         },
+    
         token: req.body.tokens,
         
     }
