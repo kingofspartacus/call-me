@@ -32,3 +32,4 @@ app.post('/send-noti',(req,res)=>{
 app.listen(3000,()=>{
     console.log('server running')
 })
+

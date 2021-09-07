@@ -16,15 +16,24 @@ export default function Register({ navigation }: { navigation: any }) {
   // const auth = firebase.auth();
   const regisiter = (Email: string, Password: string) => {
     if (!Email.trim()) {
-      alert('Please Enter Username');
+      Alert.alert(
+        "Thông báo",
+        "Điền cái Email đi! Làm ơn",
+        );
       return;
     }
     if (!Password.trim()) {
-      alert('Please Enter Password');
+      Alert.alert(
+        "Thông báo",
+        "Điền nốt cái mật khẩu đi! Làm ơn",
+        );
       return;
     }
     if (!Name.trim()) {
-      alert('Please Enter Name');
+      Alert.alert(
+        "Thông báo",
+        "Xin đấy sao ko điền nốt cái tên vào rồi hãy sign in",
+        );
       return;
     }
     auth()
@@ -43,6 +52,7 @@ export default function Register({ navigation }: { navigation: any }) {
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
             displayName: Name,
+            displayMail:Email,
             status: false,
             token: '',
             ImgUrl: ImgUrl
@@ -51,24 +61,23 @@ export default function Register({ navigation }: { navigation: any }) {
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });
 
-        var user = userCredential.user;
-        user
-          .updateProfile({
-            displayName: Name,
-            photoURL: ImgUrl
-              ? ImgUrl
-              : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
-          })
-          .then(function () {
-            // Update successful.
-          })
-          .catch(function (error) {
-            // An error happened.
-          });
+        // var user = userCredential.user;
+        // user
+        //   .updateProfile({
+        //     displayName: Name,
+        //     photoURL: ImgUrl
+        //       ? ImgUrl
+        //       : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
+        //   })
+        //   .then(function () {
+        //     // Update successful.
+        //   })
+        //   .catch(function (error) {
+        //     // An error happened.
+        //   });
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
           Alert.alert(
             "Email đã tồn tại",
             "Thay đổi email đăng ký",
@@ -105,12 +114,14 @@ export default function Register({ navigation }: { navigation: any }) {
         <TextInput
           onChangeText={useEmail}
           value={Email}
+          placeholderTextColor="grey"
           placeholder="Enter your email here"
           style={styles.TextIP}
         />
         <TextInput
           onChangeText={UsePassword}
           value={Password}
+          placeholderTextColor="grey"
           placeholder="Enter your passwork here"
           style={styles.TextIP}
           secureTextEntry={true}
@@ -118,12 +129,14 @@ export default function Register({ navigation }: { navigation: any }) {
         <TextInput
           onChangeText={setName}
           value={Name}
+          placeholderTextColor="grey"
           placeholder="Enter your name here"
           style={styles.TextIP}
         />
         <TextInput
           onChangeText={setImgUrl}
           value={ImgUrl}
+          placeholderTextColor="grey"
           placeholder="Enter your url image here"
           style={styles.TextIP}
         />

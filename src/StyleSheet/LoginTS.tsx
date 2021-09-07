@@ -10,8 +10,12 @@ const styles = StyleSheet.create({
         width:150,
         height:150,
         alignSelf:'center',
-        marginBottom:60,
         marginTop:100,
+    },
+    Title:{
+        marginBottom:60,
+        fontSize:25,
+        fontWeight:'bold'
     },
     TextIP:{
         borderBottomWidth:1,

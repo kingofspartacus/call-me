@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Image, FlatList, Alert, PermissionsAndroid } from 'react-native'
+import { View, Modal, Text, TouchableOpacity, Image, FlatList, Alert, PermissionsAndroid } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import messaging from '@react-native-firebase/messaging';
 import RNCallKeep from 'react-native-callkeep';
+import { SwipeListView } from 'react-native-swipe-list-view';
 // import RNVoipCall from 'react-native-voip-call';
 // import uuid from 'react-native-uuid';
 import createUUID from '../helpers/createUUID';
-interface optionsDefaultNumber {
-  alertTitle: string,
-  alertDescription: string,
-}
+import styles from '../StyleSheet/FirstScreenTS';
+
 export default function FirstScreen({ navigation }: { navigation: any }) {
   const [data, setData] = useState([]);
   const [authID, setAuthId] = useState();
+  const [AuthImg, setAuthImg] = useState();
+  const [AuthName, setAuthName] = useState();
+  const [AuthMail, setAuthMail] = useState();
+  const [AuthToken, setAuthToken] = useState();
+  const [modalVisible, setModalVisible] = useState(false);
+
   useEffect(() => {
     auth()
     const authCurrent: any = firebase.auth().currentUser?.uid;
@@ -36,6 +41,14 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       .catch(token => {
         console.log('Error getting documents: ', token);
       });
+    firestore().collection('users').doc(authID).get()
+      .then(authUser => {
+        const docsData: any = authUser
+        setAuthImg(docsData._data.ImgUrl)
+        setAuthName(docsData._data.displayName)
+        setAuthMail(docsData._data.displayMail)
+        setAuthToken(docsData._data.token)
+      })
   }, [authID])
   const options = {
     ios: {
@@ -83,13 +96,25 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         console.log('Answer: ' + callUUID);
         RNCallKeep.rejectCall(callUUID);
         RNCallKeep.backToForeground();
-        navigation.navigate('nam');
+        navigation.navigate('Call');
       });
       RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
         console.log("ok end call");
         console.log('Reject: ' + callUUID);
+        fetch('https://ed4e-58-186-58-82.ngrok.io/send-noti', {
+          method: 'post',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            tokens: AuthToken,
+          }),
+        })
         RNCallKeep.rejectCall(callUUID);
       });
+      setTimeout(() => {
+        RNCallKeep.rejectCall(uuid);
+      }, 15000);
     } catch (error) {
       console.log('Error: ', error);
     }
@@ -98,35 +123,6 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     messaging().onMessage(remoteMessage => {
       definirContaTelefonePadrao(),
         display()
-      // Alert.alert('a new notification', JSON.stringify(remoteMessage))
-      // let callOptions = {
-      //   callerId: '3boVthK6UqQYwI1lWBDoqhYjWhK2', // Important uuid must in this format
-      //   ios: {
-      //     phoneNumber: '0999999999', // Caller Mobile Number
-      //     name: 'Test', // caller Name
-      //     hasVideo: true,
-      //   },
-      //   android: {
-      //     ringtuneSound: true, // default true
-      //     ringtune: '', // add file inside Project_folder/android/app/res/raw
-      //     duration: 30000, // default 30000
-      //     vibration: true, // default is true
-      //     channel_name: 'Calling', //
-      //     notificationId: 123,
-      //     notificationTitle: 'Incoming Call',
-      //     notificationBody: 'Calling from Agora',
-      //     answerActionTitle: 'Answer',
-      //     declineActionTitle: 'Decline',
-      //     missedCallTitle: 'Call Missed',
-      //     missedCallBody: 'You missed a call',
-      //   },
-      // };
-      // RNVoipCall.displayIncomingCall(callOptions);
-      // RNVoipCall.onCallAnswer(() => {
-      //   navigation.navigate('nam');
-      //   RNVoipCall.endAllCalls();
-      // });
-
     })
   })
   const SignOut = (authID: any) => {
@@ -143,7 +139,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       });
   };
   const sendNoti = ({ item }: { item: any }) => {
-    fetch('https://8077-123-24-188-243.ngrok.io/send-noti', {
+    fetch('https://ed4e-58-186-58-82.ngrok.io/send-noti', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -154,28 +150,82 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     })
   }
   return (
-    <View>
-      <TouchableOpacity onPress={() => { SignOut(authID) }}>
-        <Text>Log out</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={data}
-        renderItem={(item: any) => {
-          return (
-            authID !== item.item.id ?
-              <TouchableOpacity onPress={() => { sendNoti(item) }}>
-                <View>
-                  <Text>{item.item.displayName}</Text>
-                  <Image source={{ uri: item.item.ImgUrl }} style={{ height: 100, width: 100 }} />
-                  {item.item.status === true ?
-                    <Image source={require('../assets/images/online.png')} style={{ height: 20, width: 20 }} /> :
-                    <Image source={require('../assets/images/offline.png')} style={{ height: 20, width: 20 }} />
-                  }
+    <View style={styles.container}>
+      <Image source={require('../assets/images/background.jpg')} style={{ width: '100%', height: '100%', position: 'absolute' }} />
+      <View style={styles.back}>
+        <Text style={styles.logo}>CALL ME</Text>
+        <TouchableOpacity onPress={() => setModalVisible(true)} >
+          {/* <TouchableOpacity onPress={() => { SignOut(authID) }} > */}
+          <Image source={{ uri: AuthImg }} style={styles.Profile} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.ListContainer}>
+
+        {/* Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <View style={styles.modalcontainer}>
+            <View style={styles.InfMDCon} >
+              <Image source={{ uri: AuthImg }} style={styles.ProfileMD} />
+              <Text style={styles.Mdtxt}>Name: {AuthName}</Text>
+              <Text style={styles.Mdtxt}>Email: {AuthMail}</Text>
+            </View>
+            <View style={styles.BtMdCon}>
+              <TouchableOpacity style={styles.btgb} onPress={() => setModalVisible(!modalVisible)}>
+                <Text>Go back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btlo} onPress={() => { SignOut(authID) }} >
+                <Text>Log out</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        {/* Modal */}
+
+        <SwipeListView
+          data={data}
+          style={styles.list}
+          renderItem={(item: any) => {
+            return (
+              authID !== item.item.id ?
+                <View >
+                  <View style={styles.Item}>
+                    <View style={styles.containerAva}>
+                      <Image source={{ uri: item.item.ImgUrl }} style={styles.Avatar} />
+                      {item.item.status === true
+                        ?
+                        <View style={styles.online} />
+                        :
+                        <View style={styles.offline} />
+                      }
+                    </View>
+                    <View style={styles.TxtItem}>
+                      <Text style={styles.name}>{item.item.displayName}</Text>
+                      <Text style={styles.mail}>{item.item.displayMail}</Text>
+                    </View>
+                  </View>
                 </View>
-              </TouchableOpacity> : <View />
-          )
-        }}
-      />
+                : <View />
+            )
+          }}
+          renderHiddenItem={(item: any) => (
+            <TouchableOpacity style={styles.ItemBack} onPress={() => { sendNoti(item), navigation.navigate('Call') }}>
+              <Image
+                source={require('../assets/images/call.png')}
+                style={styles.callBT}
+              />
+            </TouchableOpacity>
+          )}
+          rightOpenValue={-100}
+        />
+      </View>
     </View>
   )
 }

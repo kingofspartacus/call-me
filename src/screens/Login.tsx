@@ -39,10 +39,12 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         source={require('../assets/images/Logo.png')}
         style={styles.Img}
       />
+      <Text style={styles.Title}>CALL ME</Text>
       <TextInput
         onChangeText={useEmail}
         value={Email}
         placeholder="Email"
+        placeholderTextColor="grey"
         style={styles.TextIP}
       />
       <TextInput
@@ -50,6 +52,7 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         value={Password}
         style={styles.TextIP}
         placeholder="Password"
+        placeholderTextColor="grey"
         secureTextEntry={true} 
       />
       <TouchableOpacity onPress={() => SignIn(Email, Password)} style={styles.Signin}>
