@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text,Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import styles from '../StyleSheet/LoginTS'
-import firestore from '@react-native-firebase/firestore';
-import messaging from '@react-native-firebase/messaging';
+
 export default function LoginMail({ navigation }: { navigation: any }) {
-  // const navigation = useNavigation()
   const [Email, useEmail] = useState('');
   const [Password, UsePassword] = useState('');
   const SignIn = (Email: string, Password: string) => {
@@ -53,7 +51,7 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         style={styles.TextIP}
         placeholder="Password"
         placeholderTextColor="grey"
-        secureTextEntry={true} 
+        secureTextEntry={true}
       />
       <TouchableOpacity onPress={() => SignIn(Email, Password)} style={styles.Signin}>
         <Text style={styles.txtLogin}>Đăng nhập</Text>

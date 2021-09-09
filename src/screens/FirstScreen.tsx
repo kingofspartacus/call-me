@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { View, Modal, Text, TouchableOpacity, Image, FlatList, Alert, PermissionsAndroid } from 'react-native'
+import { View, Modal, Text, TouchableOpacity, Image, Alert, PermissionsAndroid } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import messaging from '@react-native-firebase/messaging';
 import RNCallKeep from 'react-native-callkeep';
+import AgoraUIKit from 'agora-rn-uikit';
 import { SwipeListView } from 'react-native-swipe-list-view';
-// import RNVoipCall from 'react-native-voip-call';
-// import uuid from 'react-native-uuid';
+import uuid from 'react-native-uuid';
 import createUUID from '../helpers/createUUID';
 import styles from '../StyleSheet/FirstScreenTS';
 
@@ -17,8 +17,18 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   const [AuthImg, setAuthImg] = useState();
   const [AuthName, setAuthName] = useState();
   const [AuthMail, setAuthMail] = useState();
-  const [AuthToken, setAuthToken] = useState();
+  const [videoCall, setVideoCall] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const rtcProps = {
+    appId: 'bd082fe6626440a6b16e6256814524f8',
+    channel: uuid.v4().toString(),
+  };
+
+  const [messageReceiver, setMessageReceiver] = useState({
+    appId: '',
+    channel: '',
+  });
 
   useEffect(() => {
     auth()
@@ -47,7 +57,6 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         setAuthImg(docsData._data.ImgUrl)
         setAuthName(docsData._data.displayName)
         setAuthMail(docsData._data.displayMail)
-        setAuthToken(docsData._data.token)
       })
   }, [authID])
   const options = {
@@ -75,52 +84,38 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   async function definirContaTelefonePadrao() {
     const status = await RNCallKeep.hasPhoneAccount();
     if (status == false) {
-      const optionsDefaultNumber = {
-        alertTitle: 'Default not set',
-        alertDescription: 'Please set the default phone account'
-      };
-      RNCallKeep.hasDefaultPhoneAccount(optionsDefaultNumber);
+      RNCallKeep.hasDefaultPhoneAccount();
     }
   }
   async function display() {
     await definirContaTelefonePadrao();
-    const uuid = createUUID();
+    const UUID = createUUID();
     try {
       RNCallKeep.displayIncomingCall(
-        uuid,
+        UUID,
         'Your call is comming',
         'Galic4',
       );
       RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-        console.log("ok connecting..");
-        console.log('Answer: ' + callUUID);
         RNCallKeep.rejectCall(callUUID);
         RNCallKeep.backToForeground();
-        navigation.navigate('Call');
+        setVideoCall(true);
       });
       RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-        console.log("ok end call");
-        console.log('Reject: ' + callUUID);
-        fetch('https://ed4e-58-186-58-82.ngrok.io/send-noti', {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            tokens: AuthToken,
-          }),
-        })
         RNCallKeep.rejectCall(callUUID);
       });
       setTimeout(() => {
-        RNCallKeep.rejectCall(uuid);
+        RNCallKeep.rejectCall(UUID);
       }, 15000);
     } catch (error) {
       console.log('Error: ', error);
     }
   }
   useEffect(() => {
-    messaging().onMessage(remoteMessage => {
+    messaging().onMessage((remoteMessage: any) => {
+      const msDataReceiver = remoteMessage.data;
+      const { dataChannel } = JSON.parse(msDataReceiver.json);
+      setMessageReceiver({ appId: dataChannel.appId, channel: dataChannel.channel, });
       definirContaTelefonePadrao(),
         display()
     })
@@ -139,93 +134,98 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       });
   };
   const sendNoti = ({ item }: { item: any }) => {
-    fetch('https://ed4e-58-186-58-82.ngrok.io/send-noti', {
+    fetch('https://0932-42-113-119-178.ngrok.io/send-noti', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         tokens: item.token,
+        dataChannel: rtcProps
       }),
     })
+    setMessageReceiver({ appId: rtcProps.appId, channel: rtcProps.channel });
+    setVideoCall(true);
   }
+
+  const callbacks = {
+    EndCall: () => setVideoCall(false),
+  };
   return (
-    <View style={styles.container}>
-      <Image source={require('../assets/images/background.jpg')} style={{ width: '100%', height: '100%', position: 'absolute' }} />
-      <View style={styles.back}>
-        <Text style={styles.logo}>CALL ME</Text>
-        <TouchableOpacity onPress={() => setModalVisible(true)} >
-          {/* <TouchableOpacity onPress={() => { SignOut(authID) }} > */}
-          <Image source={{ uri: AuthImg }} style={styles.Profile} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.ListContainer}>
-
-        {/* Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert("Modal has been closed.");
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <View style={styles.modalcontainer}>
-            <View style={styles.InfMDCon} >
-              <Image source={{ uri: AuthImg }} style={styles.ProfileMD} />
-              <Text style={styles.Mdtxt}>Name: {AuthName}</Text>
-              <Text style={styles.Mdtxt}>Email: {AuthMail}</Text>
+    videoCall === false ?
+      <View style={styles.container}>
+        <Image source={require('../assets/images/background.jpg')} style={{ width: '100%', height: '100%', position: 'absolute' }} />
+        <View style={styles.back}>
+          <Text style={styles.logo}>CALL ME</Text>
+          <TouchableOpacity onPress={() => setModalVisible(true)} >
+            <Image source={{ uri: AuthImg }} style={styles.Profile} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.ListContainer}>
+          {/* Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert("Modal has been closed.");
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <View style={styles.modalcontainer}>
+              <View style={styles.InfMDCon} >
+                <Image source={{ uri: AuthImg }} style={styles.ProfileMD} />
+                <Text style={styles.Mdtxt}>Name: {AuthName}</Text>
+                <Text style={styles.Mdtxt}>Email: {AuthMail}</Text>
+              </View>
+              <View style={styles.BtMdCon}>
+                <TouchableOpacity style={styles.btgb} onPress={() => setModalVisible(!modalVisible)}>
+                  <Text>Go back</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btlo} onPress={() => { SignOut(authID) }} >
+                  <Text>Log out</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.BtMdCon}>
-              <TouchableOpacity style={styles.btgb} onPress={() => setModalVisible(!modalVisible)}>
-                <Text>Go back</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btlo} onPress={() => { SignOut(authID) }} >
-                <Text>Log out</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-        {/* Modal */}
-
-        <SwipeListView
-          data={data}
-          style={styles.list}
-          renderItem={(item: any) => {
-            return (
-              authID !== item.item.id ?
-                <View >
-                  <View style={styles.Item}>
-                    <View style={styles.containerAva}>
-                      <Image source={{ uri: item.item.ImgUrl }} style={styles.Avatar} />
-                      {item.item.status === true
-                        ?
-                        <View style={styles.online} />
-                        :
-                        <View style={styles.offline} />
-                      }
-                    </View>
-                    <View style={styles.TxtItem}>
-                      <Text style={styles.name}>{item.item.displayName}</Text>
-                      <Text style={styles.mail}>{item.item.displayMail}</Text>
+          </Modal>
+          {/* Modal */}
+          <SwipeListView
+            data={data}
+            style={styles.list}
+            renderItem={(item: any) => {
+              return (
+                authID !== item.item.id ?
+                  <View >
+                    <View style={styles.Item}>
+                      <View style={styles.containerAva}>
+                        <Image source={{ uri: item.item.ImgUrl }} style={styles.Avatar} />
+                        {item.item.status === true ?
+                          <View style={styles.online} />
+                          :
+                          <View style={styles.offline} />
+                        }
+                      </View>
+                      <View style={styles.TxtItem}>
+                        <Text style={styles.name}>{item.item.displayName}</Text>
+                        <Text style={styles.mail}>{item.item.displayMail}</Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-                : <View />
-            )
-          }}
-          renderHiddenItem={(item: any) => (
-            <TouchableOpacity style={styles.ItemBack} onPress={() => { sendNoti(item), navigation.navigate('Call') }}>
-              <Image
-                source={require('../assets/images/call.png')}
-                style={styles.callBT}
-              />
-            </TouchableOpacity>
-          )}
-          rightOpenValue={-100}
-        />
-      </View>
-    </View>
+                  : <View />
+              )
+            }}
+            renderHiddenItem={(item: any) => (
+              <TouchableOpacity style={styles.ItemBack} onPress={() => { sendNoti(item) }}>
+                <Image
+                  source={require('../assets/images/call.png')}
+                  style={styles.callBT}
+                />
+              </TouchableOpacity>
+            )}
+            rightOpenValue={-100}
+          />
+        </View>
+      </View> :
+      <AgoraUIKit rtcProps={messageReceiver} callbacks={callbacks} />
   )
 }

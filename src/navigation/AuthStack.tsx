@@ -6,16 +6,10 @@ import Login from '../screens/Login'
 import Register from '../screens/Register';
 import FirstScreen from '../screens/FirstScreen';
 import nam from '../screens/Haha';
-import { Header } from 'react-native/Libraries/NewAppScreen';
 import inCall from '../screens/InCall';
 const Stack = createStackNavigator();
 const Authent = () => {
   return (
-    //   <Stack.Navigator >
-    //     <Stack.Screen options={{ header: () => null }} name="logIn" component={logIn} />
-    //     <Stack.Screen options={{ header: () => null }} name="signIn" component={signIn} />
-    //     <Stack.Screen options={{ header: () => null }} name="signUp" component={signUp} />
-    //   </Stack.Navigator>
     <Stack.Navigator initialRouteName="Login" screenOptions={{
       headerShown: false
     }}>
