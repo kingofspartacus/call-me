@@ -10,16 +10,19 @@ admin.initializeApp({
 });
 
 app.post('/send-noti',(req,res)=>{
-    
     console.log(req.body)
-        const message ={
-            notification:{
-            title:"Mess",
-            body:"????",
+    const data = {
+        dataChannel : req.body.dataChannel
+    };
+    const message ={
+        notification:{
+            title:"You have are phone call",
+            body:"????",    
         },
-    
         token: req.body.tokens,
-        
+        data: {
+            json: JSON.stringify(data)
+        }
     }
    
     admin.messaging().send(message).then(res =>{
@@ -28,6 +31,26 @@ app.post('/send-noti',(req,res)=>{
         console.log(err)
     })
 })
+
+// app.post('/send-back-noti',(req,res)=>{
+    
+//   console.log(req.body)
+//       const message ={
+//           notification:{
+//           title:"Nam",
+//           body:"Tô",
+//       },
+  
+//       token: req.body.tokens,
+      
+//   }
+ 
+//   admin.messaging().send(message).then(res =>{
+//       console.log('send succes')
+//   }).catch(err =>{
+//       console.log(err)
+//   })
+// })
 
 app.listen(3000,()=>{
     console.log('server running')
