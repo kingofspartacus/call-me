@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native'
-
 const styles = StyleSheet.create({
     container: {
         width: '100%',
@@ -41,12 +40,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#00CC33'
     },
+    ItemBackRJ: {
+        width: '100%',
+        height: 90,
+        justifyContent: 'center',
+        backgroundColor: 'orange'
+    },
     Itemfather: {
         width: '100%',
         height: 85,
         backgroundColor: 'white',
         flexDirection: 'row',
-
     },
     Item: {
         width: '105%',
@@ -142,7 +146,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-
     },
     btlo: {
         width: 80,
@@ -151,7 +154,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,
-
+    },
+    callstatus: {
+        width: 100,
+        height: 20,
+        backgroundColor: 'orange',
+        borderRadius: 5,
+        marginTop: 5
+    },
+    statusCallText: {
+        color: 'black',
+        textAlign: 'center',
+        fontWeight: '400',
     },
 })
 export default styles

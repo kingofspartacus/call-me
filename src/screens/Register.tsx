@@ -19,21 +19,21 @@ export default function Register({ navigation }: { navigation: any }) {
       Alert.alert(
         "Thông báo",
         "Điền cái Email đi! Làm ơn",
-        );
+      );
       return;
     }
     if (!Password.trim()) {
       Alert.alert(
         "Thông báo",
         "Điền nốt cái mật khẩu đi! Làm ơn",
-        );
+      );
       return;
     }
     if (!Name.trim()) {
       Alert.alert(
         "Thông báo",
         "Xin đấy sao ko điền nốt cái tên vào rồi hãy sign in",
-        );
+      );
       return;
     }
     auth()
@@ -52,29 +52,15 @@ export default function Register({ navigation }: { navigation: any }) {
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
             displayName: Name,
-            displayMail:Email,
+            displayMail: Email,
             status: false,
+            calling: false,
             token: '',
             ImgUrl: ImgUrl
 
               ? ImgUrl
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });
-
-        // var user = userCredential.user;
-        // user
-        //   .updateProfile({
-        //     displayName: Name,
-        //     photoURL: ImgUrl
-        //       ? ImgUrl
-        //       : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
-        //   })
-        //   .then(function () {
-        //     // Update successful.
-        //   })
-        //   .catch(function (error) {
-        //     // An error happened.
-        //   });
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {

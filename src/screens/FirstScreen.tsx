@@ -19,17 +19,14 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   const [AuthMail, setAuthMail] = useState();
   const [videoCall, setVideoCall] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
   const rtcProps = {
     appId: 'bd082fe6626440a6b16e6256814524f8',
     channel: uuid.v4().toString(),
   };
-
   const [messageReceiver, setMessageReceiver] = useState({
     appId: '',
     channel: '',
   });
-
   useEffect(() => {
     auth()
     const authCurrent: any = firebase.auth().currentUser?.uid;
@@ -100,6 +97,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         RNCallKeep.rejectCall(callUUID);
         RNCallKeep.backToForeground();
         setVideoCall(true);
+        firestore().collection('users').doc(authID).update({ calling: true })
       });
       RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
         RNCallKeep.rejectCall(callUUID);
@@ -134,22 +132,25 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       });
   };
   const sendNoti = ({ item }: { item: any }) => {
-    fetch('https://0932-42-113-119-178.ngrok.io/send-noti', {
+    fetch('https://c6f5-42-113-119-178.ngrok.io/send-noti', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         tokens: item.token,
-        dataChannel: rtcProps
+        dataChannel: rtcProps,
       }),
     })
     setMessageReceiver({ appId: rtcProps.appId, channel: rtcProps.channel });
     setVideoCall(true);
+    firestore().collection('users').doc(authID).update({ calling: true })
   }
-
   const callbacks = {
-    EndCall: () => setVideoCall(false),
+    EndCall: () => {
+      setVideoCall(false),
+        firestore().collection('users').doc(authID).update({ calling: false })
+    }
   };
   return (
     videoCall === false ?
@@ -208,20 +209,37 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
                       <View style={styles.TxtItem}>
                         <Text style={styles.name}>{item.item.displayName}</Text>
                         <Text style={styles.mail}>{item.item.displayMail}</Text>
+                        {item.item.calling === false ?
+                          <View />
+                          :
+                          <View style={styles.callstatus}>
+                            <Text style={styles.statusCallText}>Has other call</Text>
+                          </View>
+                        }
                       </View>
                     </View>
                   </View>
                   : <View />
               )
             }}
-            renderHiddenItem={(item: any) => (
-              <TouchableOpacity style={styles.ItemBack} onPress={() => { sendNoti(item) }}>
-                <Image
-                  source={require('../assets/images/call.png')}
-                  style={styles.callBT}
-                />
-              </TouchableOpacity>
-            )}
+            renderHiddenItem={(item: any) => {
+              return (
+                item.item.calling === false ?
+                  <TouchableOpacity style={styles.ItemBack} onPress={() => { sendNoti(item) }}>
+                    <Image
+                      source={require('../assets/images/call.png')}
+                      style={styles.callBT}
+                    />
+                  </TouchableOpacity>
+                  :
+                  <View style={styles.ItemBackRJ}>
+                    <Image
+                      source={require('../assets/images/rejected-call.png')}
+                      style={styles.callBT}
+                    />
+                  </View>
+              )
+            }}
             rightOpenValue={-100}
           />
         </View>
