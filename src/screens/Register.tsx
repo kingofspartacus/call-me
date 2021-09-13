@@ -4,8 +4,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import styles from '../StyleSheet/SignUpTS'
-import messaging from '@react-native-firebase/messaging';
-// import { auth, authCurrent } from '../components/FireConect';
 
 export default function Register({ navigation }: { navigation: any }) {
   const [Email, useEmail] = useState('');

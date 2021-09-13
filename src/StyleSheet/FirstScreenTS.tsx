@@ -36,13 +36,13 @@ const styles = StyleSheet.create({
     },
     ItemBack: {
         width: '100%',
-        height: 90,
+        height: 100,
         justifyContent: 'center',
         backgroundColor: '#00CC33'
     },
     ItemBackRJ: {
         width: '100%',
-        height: 90,
+        height: 100,
         justifyContent: 'center',
         backgroundColor: 'orange'
     },

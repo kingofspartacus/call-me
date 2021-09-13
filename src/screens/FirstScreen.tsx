@@ -14,19 +14,24 @@ import styles from '../StyleSheet/FirstScreenTS';
 export default function FirstScreen({ navigation }: { navigation: any }) {
   const [data, setData] = useState([]);
   const [authID, setAuthId] = useState();
-  const [AuthImg, setAuthImg] = useState();
-  const [AuthName, setAuthName] = useState();
-  const [AuthMail, setAuthMail] = useState();
+  const [IDsender, setIDsender] = useState();
   const [videoCall, setVideoCall] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const rtcProps = {
-    appId: 'bd082fe6626440a6b16e6256814524f8',
-    channel: uuid.v4().toString(),
-  };
   const [messageReceiver, setMessageReceiver] = useState({
     appId: '',
     channel: '',
   });
+  const [userAuth, setUserAuth] = useState({
+    ImgUrl: '',
+    displayMail: '',
+    displayName: '',
+    acceptCall: true
+  });
+  const rtcProps = {
+    appId: 'bd082fe6626440a6b16e6256814524f8',
+    channel: uuid.v4().toString(),
+    UidSender: authID,
+  };
   useEffect(() => {
     auth()
     const authCurrent: any = firebase.auth().currentUser?.uid;
@@ -36,6 +41,10 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         ...doc.data()
       }));
       setData(docsData);
+    })
+    firestore().collection('users').doc(authCurrent).onSnapshot(authUser => {
+      const docsData: any = authUser
+      setUserAuth(docsData._data)
     })
   }, []);
   useEffect(() => {
@@ -48,14 +57,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       .catch(token => {
         console.log('Error getting documents: ', token);
       });
-    firestore().collection('users').doc(authID).get()
-      .then(authUser => {
-        const docsData: any = authUser
-        setAuthImg(docsData._data.ImgUrl)
-        setAuthName(docsData._data.displayName)
-        setAuthMail(docsData._data.displayMail)
-      })
-  }, [authID])
+  }, [authID]);
+
   const options = {
     ios: {
       appName: 'Nome do meu app',
@@ -75,34 +78,56 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       },
     },
   };
-  RNCallKeep.setup(options).then((accepted) => {
-    RNCallKeep.setAvailable(true);
-  });
-  async function definirContaTelefonePadrao() {
+  const answerCall = ({ callUUID }: { callUUID: string }) => {
+    console.log('answerCall')
+    setVideoCall(true)
+    firestore().collection('users').doc(authID).update({ calling: true })
+    RNCallKeep.rejectCall(callUUID)
+  };
+  const endCall = ({ callUUID }: { callUUID: string }) => {
+    console.log('endCall')
+    firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+  };
+  useEffect(() => {
+    RNCallKeep.addEventListener('didReceiveStartCallAction', ({ handle, callUUID, name }) => {
+      console.log('didReceiveStartCall')
+      if (!handle) {
+        return;
+      }
+    });
+    RNCallKeep.addEventListener('didDisplayIncomingCall', ({ error, callUUID, handle, localizedCallerName, hasVideo, fromPushKit, payload }) => {
+      console.log('didDisplayIncomingCall')
+    });
+    RNCallKeep.addEventListener('answerCall', answerCall);
+    RNCallKeep.addEventListener('endCall', endCall);
+    return () => {
+      // RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('endCall');
+    }
+  }, []);
+  useEffect(() => {
+    RNCallKeep.setup(options).then((accepted) => {
+      RNCallKeep.setAvailable(true);
+    });
+  }, []);
+  async function PermissionCall() {
     const status = await RNCallKeep.hasPhoneAccount();
     if (status == false) {
       RNCallKeep.hasDefaultPhoneAccount();
     }
   }
   async function display() {
-    await definirContaTelefonePadrao();
+    await PermissionCall();
     const UUID = createUUID();
     try {
       RNCallKeep.displayIncomingCall(
         UUID,
         'Your call is comming',
         'Galic4',
-      );
-      RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-        RNCallKeep.rejectCall(callUUID);
-        RNCallKeep.backToForeground();
-        setVideoCall(true);
-        firestore().collection('users').doc(authID).update({ calling: true })
-      });
-      RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-        RNCallKeep.rejectCall(callUUID);
-      });
+      )
       setTimeout(() => {
+        console.log('setTimeout')
+        firestore().collection('users').doc(IDsender).update({ acceptCall: false })
         RNCallKeep.rejectCall(UUID);
       }, 15000);
     } catch (error) {
@@ -113,11 +138,12 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     messaging().onMessage((remoteMessage: any) => {
       const msDataReceiver = remoteMessage.data;
       const { dataChannel } = JSON.parse(msDataReceiver.json);
+      setIDsender(dataChannel.UidSender)
       setMessageReceiver({ appId: dataChannel.appId, channel: dataChannel.channel, });
-      definirContaTelefonePadrao(),
-        display()
+      PermissionCall()
+      display()
     })
-  })
+  });
   const SignOut = (authID: any) => {
     firestore().collection('users').doc(authID).update({
       status: false,
@@ -132,7 +158,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       });
   };
   const sendNoti = ({ item }: { item: any }) => {
-    fetch('https://c6f5-42-113-119-178.ngrok.io/send-noti', {
+    fetch('https://3575-42-113-119-178.ngrok.io/send-noti', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
@@ -140,6 +166,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       body: JSON.stringify({
         tokens: item.token,
         dataChannel: rtcProps,
+        message: 'You have a call with ' + userAuth?.displayName,
       }),
     })
     setMessageReceiver({ appId: rtcProps.appId, channel: rtcProps.channel });
@@ -152,6 +179,9 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         firestore().collection('users').doc(authID).update({ calling: false })
     }
   };
+  const AcceptUserBusy = () => {
+    firestore().collection('users').doc(authID).update({ acceptCall: true })
+  }
   return (
     videoCall === false ?
       <View style={styles.container}>
@@ -159,9 +189,18 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         <View style={styles.back}>
           <Text style={styles.logo}>CALL ME</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)} >
-            <Image source={{ uri: AuthImg }} style={styles.Profile} />
+            <Image source={{ uri: userAuth?.ImgUrl }} style={styles.Profile} />
           </TouchableOpacity>
         </View>
+        {userAuth?.acceptCall === false ?
+          Alert.alert(
+            "Thông báo",
+            "Người dùng đang bận",
+            [
+              { text: "OK", onPress: () => { AcceptUserBusy() } }
+            ]) :
+          <View />
+        }
         <View style={styles.ListContainer}>
           {/* Modal */}
           <Modal
@@ -175,9 +214,9 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
           >
             <View style={styles.modalcontainer}>
               <View style={styles.InfMDCon} >
-                <Image source={{ uri: AuthImg }} style={styles.ProfileMD} />
-                <Text style={styles.Mdtxt}>Name: {AuthName}</Text>
-                <Text style={styles.Mdtxt}>Email: {AuthMail}</Text>
+                <Image source={{ uri: userAuth?.ImgUrl }} style={styles.ProfileMD} />
+                <Text style={styles.Mdtxt}>Name: {userAuth?.displayName}</Text>
+                <Text style={styles.Mdtxt}>Email: {userAuth?.displayMail}</Text>
               </View>
               <View style={styles.BtMdCon}>
                 <TouchableOpacity style={styles.btgb} onPress={() => setModalVisible(!modalVisible)}>
@@ -224,7 +263,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
             }}
             renderHiddenItem={(item: any) => {
               return (
-                item.item.calling === false ?
+                item.item.calling === false && item.item.status === true ?
                   <TouchableOpacity style={styles.ItemBack} onPress={() => { sendNoti(item) }}>
                     <Image
                       source={require('../assets/images/call.png')}
