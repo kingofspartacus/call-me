@@ -127,6 +127,7 @@ android {
 
     defaultConfig {
         applicationId "com.call_me"
+        applicationIdSuffix ".test"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

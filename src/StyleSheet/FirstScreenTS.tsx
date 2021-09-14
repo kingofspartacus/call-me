@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
         height: 85,
         borderRadius: 100,
         position: 'absolute',
+       
     },
     online: {
         width: 25,

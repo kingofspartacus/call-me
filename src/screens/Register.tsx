@@ -52,7 +52,7 @@ export default function Register({ navigation }: { navigation: any }) {
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
             displayName: Name,
-            displayMail:Email,
+            displayMail: Email,
             status: false,
             calling: false,
             token: '',
