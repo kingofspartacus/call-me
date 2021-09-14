@@ -78,6 +78,11 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       },
     },
   };
+  useEffect(() => {
+    RNCallKeep.setup(options).then((accepted) => {
+      RNCallKeep.setAvailable(true);
+    });
+  }, []);
   const answerCall = ({ callUUID }: { callUUID: string }) => {
     console.log('answerCall')
     setVideoCall(true)
@@ -89,50 +94,34 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     firestore().collection('users').doc(IDsender).update({ acceptCall: false })
   };
   useEffect(() => {
-    RNCallKeep.addEventListener('didReceiveStartCallAction', ({ handle, callUUID, name }) => {
-      console.log('didReceiveStartCall')
-      if (!handle) {
-        return;
-      }
-    });
-    RNCallKeep.addEventListener('didDisplayIncomingCall', ({ error, callUUID, handle, localizedCallerName, hasVideo, fromPushKit, payload }) => {
-      console.log('didDisplayIncomingCall')
-    });
     RNCallKeep.addEventListener('answerCall', answerCall);
     RNCallKeep.addEventListener('endCall', endCall);
     return () => {
-      // RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('answerCall');
       RNCallKeep.removeEventListener('endCall');
     }
   }, []);
-  useEffect(() => {
-    RNCallKeep.setup(options).then((accepted) => {
-      RNCallKeep.setAvailable(true);
-    });
-  }, []);
+
   async function PermissionCall() {
     const status = await RNCallKeep.hasPhoneAccount();
     if (status == false) {
       RNCallKeep.hasDefaultPhoneAccount();
     }
   }
-  async function display() {
-    await PermissionCall();
+  const display = () => {
+    console.log('display')
+    PermissionCall();
     const UUID = createUUID();
-    try {
-      RNCallKeep.displayIncomingCall(
-        UUID,
-        'Your call is comming',
-        'Galic4',
-      )
-      setTimeout(() => {
-        console.log('setTimeout')
-        firestore().collection('users').doc(IDsender).update({ acceptCall: false })
-        RNCallKeep.rejectCall(UUID);
-      }, 15000);
-    } catch (error) {
-      console.log('Error: ', error);
-    }
+    RNCallKeep.displayIncomingCall(
+      uuid.v4().toString(),
+      'Your call is comming',
+      'Galic4',
+    )
+    setTimeout(() => {
+      console.log('setTimeout')
+      firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+      RNCallKeep.rejectCall(UUID);
+    }, 15000);
   }
   useEffect(() => {
     messaging().onMessage((remoteMessage: any) => {
@@ -158,7 +147,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       });
   };
   const sendNoti = ({ item }: { item: any }) => {
-    fetch('https://3575-42-113-119-178.ngrok.io/send-noti', {
+    fetch('https://call-me1.herokuapp.com/send-noti', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
