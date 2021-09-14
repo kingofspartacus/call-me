@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     },
     Item: {
         width: '105%',
-        height: 110,
+        height: 100,
         backgroundColor: 'white',
         flexDirection: 'row',
         alignItems: 'center',
@@ -64,7 +64,14 @@ const styles = StyleSheet.create({
         height: 35,
         alignSelf: 'flex-end',
         tintColor: 'white',
-        marginRight: 20
+        marginRight: 25
+    },
+    callBTR: {
+        width: 30,
+        height: 30,
+        alignSelf: 'flex-end',
+        tintColor: 'white',
+        marginRight: 25
     },
     containerAva: {
         flexDirection: 'row',

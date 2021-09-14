@@ -85,11 +85,16 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   }, []);
   const answerCall = ({ callUUID }: { callUUID: string }) => {
     setVideoCall(true)
-    firestore().collection('users').doc(authID).update({ calling: true })
-    RNCallKeep.rejectCall(callUUID)
+    const answer = firestore().collection('users').doc(authID).update({ calling: true })
+    const end = firestore().collection('users').doc(authID).update({ acceptCall: true })
+    return () => {
+      answer;
+      end;
+    }
   };
   const endCall = ({ callUUID }: { callUUID: string }) => {
-    firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+    const end = firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+    return end;
   };
   useEffect(() => {
     RNCallKeep.addEventListener('answerCall', answerCall);
@@ -114,8 +119,9 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       'Galic4',
     )
     setTimeout(() => {
-      firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+      const timeout = firestore().collection('users').doc(IDsender).update({ acceptCall: false })
       RNCallKeep.rejectCall(UUID);
+      return timeout;
     }, 15000);
   }
   useEffect(() => {
@@ -263,7 +269,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
                   </View>
               )
             }}
-            rightOpenValue={-100}
+            rightOpenValue={-110}
           />
         </View>
       </View> :

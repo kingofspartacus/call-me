@@ -53,6 +53,7 @@ export default function Register({ navigation }: { navigation: any }) {
             displayMail: Email,
             status: false,
             calling: false,
+            acceptCall: true,
             token: '',
             ImgUrl: ImgUrl
 
