@@ -96,10 +96,10 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   useEffect(() => {
     RNCallKeep.addEventListener('answerCall', answerCall);
     RNCallKeep.addEventListener('endCall', endCall);
-    return () => {
-      RNCallKeep.removeEventListener('answerCall');
-      RNCallKeep.removeEventListener('endCall');
-    }
+    // return () => {
+    //   RNCallKeep.removeEventListener('answerCall');
+    //   RNCallKeep.removeEventListener('endCall');
+    // }
   }, []);
 
   async function PermissionCall() {
@@ -124,7 +124,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     }, 15000);
   }
   useEffect(() => {
-    messaging().onMessage((remoteMessage: any) => {
+    const unsubscribe = messaging().onMessage((remoteMessage: any) => {
+      console.log('onMessage')
       const msDataReceiver = remoteMessage.data;
       const { dataChannel } = JSON.parse(msDataReceiver.json);
       setIDsender(dataChannel.UidSender)
@@ -132,7 +133,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       PermissionCall()
       display()
     })
-  });
+    return unsubscribe;
+  }, []);
   const SignOut = (authID: any) => {
     firestore().collection('users').doc(authID).update({
       status: false,
@@ -237,12 +239,11 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
                       <View style={styles.TxtItem}>
                         <Text style={styles.name}>{item.item.displayName}</Text>
                         <Text style={styles.mail}>{item.item.displayMail}</Text>
-                        {item.item.calling === false ?
-                          <View />
-                          :
+                        {item.item.calling === true ?
                           <View style={styles.callstatus}>
                             <Text style={styles.statusCallText}>Has other call</Text>
-                          </View>
+                          </View> :
+                          <View />
                         }
                       </View>
                     </View>
