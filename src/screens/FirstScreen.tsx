@@ -48,7 +48,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     })
   }, []);
   useEffect(() => {
-    messaging().getToken().then((token: any) => {
+    messaging().getToken().then((token: string) => {
       firestore().collection('users').doc(authID).update({
         status: true,
         token: token
@@ -84,13 +84,11 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     });
   }, []);
   const answerCall = ({ callUUID }: { callUUID: string }) => {
-    console.log('answerCall')
     setVideoCall(true)
     firestore().collection('users').doc(authID).update({ calling: true })
     RNCallKeep.rejectCall(callUUID)
   };
   const endCall = ({ callUUID }: { callUUID: string }) => {
-    console.log('endCall')
     firestore().collection('users').doc(IDsender).update({ acceptCall: false })
   };
   useEffect(() => {
@@ -101,31 +99,27 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     //   RNCallKeep.removeEventListener('endCall');
     // }
   }, []);
-
   async function PermissionCall() {
     const status = await RNCallKeep.hasPhoneAccount();
     if (status == false) {
       RNCallKeep.hasDefaultPhoneAccount();
     }
   }
-  const display = () => {
-    console.log('display')
-    PermissionCall();
+  async function display() {
+    await PermissionCall();
     const UUID = createUUID();
     RNCallKeep.displayIncomingCall(
-      uuid.v4().toString(),
+      UUID,
       'Your call is comming',
       'Galic4',
     )
     setTimeout(() => {
-      console.log('setTimeout')
       firestore().collection('users').doc(IDsender).update({ acceptCall: false })
       RNCallKeep.rejectCall(UUID);
     }, 15000);
   }
   useEffect(() => {
     const unsubscribe = messaging().onMessage((remoteMessage: any) => {
-      console.log('onMessage')
       const msDataReceiver = remoteMessage.data;
       const { dataChannel } = JSON.parse(msDataReceiver.json);
       setIDsender(dataChannel.UidSender)
