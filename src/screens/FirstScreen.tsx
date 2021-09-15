@@ -84,26 +84,23 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     });
   }, []);
   const answerCall = ({ callUUID }: { callUUID: string }) => {
+    console.log('answerCall')
     setVideoCall(true)
-    const answer = firestore().collection('users').doc(authID).update({ calling: true })
-    const end = firestore().collection('users').doc(authID).update({ acceptCall: true })
-    return () => {
-      answer;
-      end;
-    }
+    RNCallKeep.rejectCall(callUUID)
+    firestore().collection('users').doc(authID).update({ calling: true })
   };
   const endCall = ({ callUUID }: { callUUID: string }) => {
-    const end = firestore().collection('users').doc(IDsender).update({ acceptCall: false })
-    return end;
+    console.log('endCall')
+    firestore().collection('users').doc(IDsender).update({ acceptCall: false })
   };
   useEffect(() => {
     RNCallKeep.addEventListener('answerCall', answerCall);
     RNCallKeep.addEventListener('endCall', endCall);
-    // return () => {
-    //   RNCallKeep.removeEventListener('answerCall');
-    //   RNCallKeep.removeEventListener('endCall');
-    // }
-  }, []);
+    return () => {
+      RNCallKeep.removeEventListener('answerCall');
+      RNCallKeep.removeEventListener('endCall');
+    }
+  });
   async function PermissionCall() {
     const status = await RNCallKeep.hasPhoneAccount();
     if (status == false) {
@@ -167,7 +164,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   const callbacks = {
     EndCall: () => {
       setVideoCall(false),
-        firestore().collection('users').doc(authID).update({ calling: false })
+        firestore().collection('users').doc(authID).update({ calling: false }),
+        firestore().collection('users').doc(IDsender).update({ acceptCall: true })
     }
   };
   const AcceptUserBusy = () => {
