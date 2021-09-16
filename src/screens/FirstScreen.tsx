@@ -142,8 +142,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         firestore().collection('users').doc(authID).update({ calling: false })
     }
   }, [userAuth?.acceptCall])
-  const SignOut = (authID: any) => {
-    firestore().collection('users').doc(authID).update({
+  async function SignOut(authID: any) {
+    await firestore().collection('users').doc(authID).update({
       status: false,
       token: null
     });
