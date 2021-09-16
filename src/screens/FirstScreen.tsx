@@ -46,6 +46,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       const docsData: any = authUser
       setUserAuth(docsData._data)
     })
+
   }, []);
   useEffect(() => {
     messaging().getToken().then((token: string) => {
@@ -57,6 +58,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       .catch(token => {
         console.log('Error getting documents: ', token);
       });
+
   }, [authID]);
 
   const options = {
@@ -134,6 +136,12 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     })
     return unsubscribe;
   }, []);
+  useEffect(() => {
+    if (userAuth?.acceptCall === false) {
+      setVideoCall(false),
+        firestore().collection('users').doc(authID).update({ calling: false })
+    }
+  }, [userAuth?.acceptCall])
   const SignOut = (authID: any) => {
     firestore().collection('users').doc(authID).update({
       status: false,
@@ -184,8 +192,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
         </View>
         {userAuth?.acceptCall === false ?
           Alert.alert(
-            "Thông báo",
-            "Người dùng đang bận",
+            "Notification",
+            "User is busy or doesn't pick up the phone",
             [
               { text: "OK", onPress: () => { AcceptUserBusy() } }
             ]) :
