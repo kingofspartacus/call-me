@@ -4,47 +4,40 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import styles from '../StyleSheet/SignUpTS'
-
 export default function Register({ navigation }: { navigation: any }) {
   const [Email, useEmail] = useState('');
   const [Password, UsePassword] = useState('');
   const [Name, setName] = useState('');
   const [ImgUrl, setImgUrl] = useState('');
-
-  // const auth = firebase.auth();
   const regisiter = (Email: string, Password: string) => {
     if (!Email.trim()) {
       Alert.alert(
-        "Thông báo",
-        "Điền cái Email đi! Làm ơn",
+        "Alert",
+        "Please enter your Email",
       );
       return;
     }
     if (!Password.trim()) {
       Alert.alert(
-        "Thông báo",
-        "Điền nốt cái mật khẩu đi! Làm ơn",
+        "Alert",
+        "Please enter your Password",
       );
       return;
     }
     if (!Name.trim()) {
       Alert.alert(
-        "Thông báo",
-        "Xin đấy sao ko điền nốt cái tên vào rồi hãy sign in",
+        "Alert",
+        "Please enter your Name",
       );
       return;
     }
     auth()
       .createUserWithEmailAndPassword(Email, Password)
-      .then((userCredential) => {
+      .then(() => {
         const authCurrent: any = firebase.auth().currentUser;
-        console.log('User account created & signed in!');
         Alert.alert(
-          "Thông báo",
-          "Đăng kí thành công",
-          [
-            { text: "OK" }
-          ]
+          "Alert",
+          "Registed success",
         );
         firestore()
           .collection('users').doc(authCurrent.uid).set({
@@ -56,7 +49,6 @@ export default function Register({ navigation }: { navigation: any }) {
             acceptCall: true,
             token: '',
             ImgUrl: ImgUrl
-
               ? ImgUrl
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });
@@ -64,26 +56,16 @@ export default function Register({ navigation }: { navigation: any }) {
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
           Alert.alert(
-            "Email đã tồn tại",
-            "Thay đổi email đăng ký",
-            [
-              { text: "Ok" }
-            ]
+            "Alert",
+            "Email existed! Change your Email",
           );
         }
-
         if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
           Alert.alert(
-            "Email chứa kí tự không hợp lệ",
-            "Chỉnh sửa",
-            [
-              { text: "Ok" }
-            ]
+            "Alert",
+            "Invalid Email! Change your Email",
           );
         }
-
-        console.error(error);
       });
   };
   return (

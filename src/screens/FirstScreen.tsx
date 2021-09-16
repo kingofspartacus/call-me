@@ -84,14 +84,16 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     });
   }, []);
   const answerCall = ({ callUUID }: { callUUID: string }) => {
-    console.log('answerCall')
     setVideoCall(true)
     RNCallKeep.rejectCall(callUUID)
     firestore().collection('users').doc(authID).update({ calling: true })
   };
   const endCall = ({ callUUID }: { callUUID: string }) => {
-    console.log('endCall')
-    firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+    if (videoCall === false) {
+      firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+    } else {
+      firestore().collection('users').doc(IDsender).update({ acceptCall: true })
+    }
   };
   useEffect(() => {
     RNCallKeep.addEventListener('answerCall', answerCall);
@@ -164,8 +166,7 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
   const callbacks = {
     EndCall: () => {
       setVideoCall(false),
-        firestore().collection('users').doc(authID).update({ calling: false }),
-        firestore().collection('users').doc(IDsender).update({ acceptCall: true })
+        firestore().collection('users').doc(authID).update({ calling: false })
     }
   };
   const AcceptUserBusy = () => {
