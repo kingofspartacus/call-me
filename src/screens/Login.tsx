@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text,Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import styles from '../StyleSheet/LoginTS'
 
 export default function LoginMail({ navigation }: { navigation: any }) {
-  // const navigation = useNavigation()
   const [Email, useEmail] = useState('');
   const [Password, UsePassword] = useState('');
   const SignIn = (Email: string, Password: string) => {
@@ -38,10 +37,12 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         source={require('../assets/images/Logo.png')}
         style={styles.Img}
       />
+      <Text style={styles.Title}>CALL ME</Text>
       <TextInput
         onChangeText={useEmail}
         value={Email}
         placeholder="Email"
+        placeholderTextColor="grey"
         style={styles.TextIP}
       />
       <TextInput
@@ -49,7 +50,8 @@ export default function LoginMail({ navigation }: { navigation: any }) {
         value={Password}
         style={styles.TextIP}
         placeholder="Password"
-        secureTextEntry={true} 
+        placeholderTextColor="grey"
+        secureTextEntry={true}
       />
       <TouchableOpacity onPress={() => SignIn(Email, Password)} style={styles.Signin}>
         <Text style={styles.txtLogin}>Đăng nhập</Text>

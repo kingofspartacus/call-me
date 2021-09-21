@@ -4,88 +4,68 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import firebase from "@react-native-firebase/app";
 import styles from '../StyleSheet/SignUpTS'
-// import { auth, authCurrent } from '../components/FireConect';
-
 export default function Register({ navigation }: { navigation: any }) {
   const [Email, useEmail] = useState('');
   const [Password, UsePassword] = useState('');
   const [Name, setName] = useState('');
   const [ImgUrl, setImgUrl] = useState('');
-  // const auth = firebase.auth();
   const regisiter = (Email: string, Password: string) => {
     if (!Email.trim()) {
-      alert('Please Enter Username');
+      Alert.alert(
+        "Alert",
+        "Please enter your Email",
+      );
       return;
     }
     if (!Password.trim()) {
-      alert('Please Enter Password');
+      Alert.alert(
+        "Alert",
+        "Please enter your Password",
+      );
       return;
     }
     if (!Name.trim()) {
-      alert('Please Enter Name');
+      Alert.alert(
+        "Alert",
+        "Please enter your Name",
+      );
       return;
     }
     auth()
       .createUserWithEmailAndPassword(Email, Password)
-      .then((userCredential) => {
+      .then(() => {
         const authCurrent: any = firebase.auth().currentUser;
-        console.log('User account created & signed in!');
         Alert.alert(
-          "Thông báo",
-          "Đăng kí thành công",
-          [
-            { text: "OK" }
-          ]
+          "Alert",
+          "Registed success",
         );
         firestore()
           .collection('users').doc(authCurrent.uid).set({
             id: authCurrent.uid,
             displayName: Name,
+            displayMail: Email,
             status: false,
+            calling: false,
+            acceptCall: true,
+            token: '',
             ImgUrl: ImgUrl
               ? ImgUrl
               : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
           });
-
-        var user = userCredential.user;
-        user
-          .updateProfile({
-            displayName: Name,
-            photoURL: ImgUrl
-              ? ImgUrl
-              : 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png',
-          })
-          .then(function () {
-            // Update successful.
-          })
-          .catch(function (error) {
-            // An error happened.
-          });
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
           Alert.alert(
-            "Email đã tồn tại",
-            "Thay đổi email đăng ký",
-            [
-              { text: "Ok" }
-            ]
+            "Alert",
+            "Email existed! Change your Email",
           );
         }
-
         if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
           Alert.alert(
-            "Email chứa kí tự không hợp lệ",
-            "Chỉnh sửa",
-            [
-              { text: "Ok" }
-            ]
+            "Alert",
+            "Invalid Email! Change your Email",
           );
         }
-
-        console.error(error);
       });
   };
   return (
@@ -101,25 +81,29 @@ export default function Register({ navigation }: { navigation: any }) {
         <TextInput
           onChangeText={useEmail}
           value={Email}
+          placeholderTextColor="grey"
           placeholder="Enter your email here"
           style={styles.TextIP}
         />
         <TextInput
           onChangeText={UsePassword}
           value={Password}
-          placeholder="Enter your passwork here"
+          placeholderTextColor="grey"
+          placeholder="Enter your password here"
           style={styles.TextIP}
-          secureTextEntry={true} 
+          secureTextEntry={true}
         />
         <TextInput
           onChangeText={setName}
           value={Name}
+          placeholderTextColor="grey"
           placeholder="Enter your name here"
           style={styles.TextIP}
         />
         <TextInput
           onChangeText={setImgUrl}
           value={ImgUrl}
+          placeholderTextColor="grey"
           placeholder="Enter your url image here"
           style={styles.TextIP}
         />
