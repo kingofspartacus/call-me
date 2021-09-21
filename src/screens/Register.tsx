@@ -89,7 +89,7 @@ export default function Register({ navigation }: { navigation: any }) {
           onChangeText={UsePassword}
           value={Password}
           placeholderTextColor="grey"
-          placeholder="Enter your passwork here"
+          placeholder="Enter your password here"
           style={styles.TextIP}
           secureTextEntry={true}
         />

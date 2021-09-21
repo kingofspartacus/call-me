@@ -120,9 +120,8 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
       'Galic4',
     )
     setTimeout(() => {
-      const timeout = firestore().collection('users').doc(IDsender).update({ acceptCall: false })
+      firestore().collection('users').doc(IDsender).update({ acceptCall: false })
       RNCallKeep.rejectCall(UUID);
-      return timeout;
     }, 15000);
   }
   useEffect(() => {
