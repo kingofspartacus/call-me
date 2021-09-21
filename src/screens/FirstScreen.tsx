@@ -125,6 +125,18 @@ export default function FirstScreen({ navigation }: { navigation: any }) {
     }, 15000);
   }
   useEffect(() => {
+    const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
+      const msDataReceiver: any = remoteMessage.data;
+      const { dataChannel } = JSON.parse(msDataReceiver.json);
+      setIDsender(dataChannel.UidSender)
+      setMessageReceiver({ appId: dataChannel.appId, channel: dataChannel.channel, });
+      PermissionCall()
+      display()
+    })
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = messaging().onMessage((remoteMessage: any) => {
       const msDataReceiver = remoteMessage.data;
       const { dataChannel } = JSON.parse(msDataReceiver.json);
